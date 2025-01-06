@@ -1,5 +1,5 @@
 import Course from "./components/Course";
-import Header from "./components/Header";
+import Header from "./components/Header"
 
 
 const App = () => {
