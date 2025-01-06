@@ -1,49 +1,68 @@
 import { useState } from "react";
-import Note from "./components/Note";
+import Header from "./components/Header";
+import Filter from "./components/Filter";
+import PersonForm from "./components/PersonForm";
+import People from "./components/People";
 
-const App = (props) => {
-  const [notes, setNotes] = useState(props.notes);
-  const [newNote, setNewNote] = useState("a new note...");
-  const [showAll, setShowAll] = useState(true);
+const App = () => {
+  // const [persons, setPersons] = useState([]);
+  const [persons, setPersons] = useState([
+    { name: "Arto Hellas", number: "040-123456", id: 1 },
+    { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
+    { name: "Dan Abramov", number: "12-43-234345", id: 3 },
+    { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
+  ]);
+  const [newName, setNewName] = useState("");
+  const [newNumber, setNewNumber] = useState("");
+  const [filter, setFilter] = useState("");
 
-  const notesToShow = showAll
-    ? notes
-    : notes.filter((note) => note.important === true);
+  const handleNameChange = (event) => {
+    setNewName(event.target.value);
+  };
 
-  const addNote = (event) => {
+  const handleNumberChange = (event) => {
+    setNewNumber(event.target.value);
+  };
+
+  const handleClick = (event) => {
     event.preventDefault();
-    const noteObject = {
-      content: newNote,
-      important: Math.random() < 0.5,
-      id: String(notes.length + 1),
-    };
+    if (personExists(newName)) {
+      alert(`${newName} is already added to phonebook`);
+      return;
+    }
 
-    setNotes(notes.concat(noteObject));
-    setNewNote("");
+    if (newName === "") {
+      alert("Please enter a name");
+      return;
+    }
+
+    setPersons(persons.concat({ name: newName, number: newNumber, id: newName }));
+    setNewName("");
+    event.target.reset();
   };
 
-  const handleNoteChange = (event) => {
-    console.log(event.target.value);
-    setNewNote(event.target.value);
-  };
+  const personExists = (name) => {
+    return persons.some((person) => person.name === name);
+  }
+
+  const filterPersons = (event) => {
+    setFilter(event.target.value);
+  }
+
+  const filteredPersons = filter ? persons.filter((person) => person.name.toLowerCase().includes(filter.toLowerCase())) : persons;
 
   return (
     <div>
-      <h1>Notes</h1>
-      <div>
-        <button onClick={() => setShowAll(!showAll)}>
-          show {showAll ? "important" : "all"}
-        </button>
-      </div>
-      <ul>
-        {notesToShow.map((note) => (
-          <Note key={note.id} note={note} />
-        ))}
-      </ul>
-      <form onSubmit={addNote}>
-        <input value={newNote} onChange={handleNoteChange} />
-        <button type="submit">save</button>
-      </form>
+      <h2>Phonebook</h2>
+      <Filter filterPersons={filterPersons} />
+      <h3>add a new</h3>
+      <PersonForm
+        handleClick={handleClick}
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+      ></PersonForm>
+      <h3>Numbers</h3>
+      <People persons={persons} filteredPersons={filteredPersons} />
     </div>
   );
 };
