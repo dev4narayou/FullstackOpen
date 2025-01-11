@@ -5,6 +5,7 @@ import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import People from "./components/People";
 import axios from "axios";
+import personService from "./services/persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -19,8 +20,8 @@ const App = () => {
   const [filter, setFilter] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
+    personService.getAll().then((initialPersons) => {
+      setPersons(initialPersons);
     });
   })
 
@@ -32,19 +33,41 @@ const App = () => {
     setNewNumber(event.target.value);
   };
 
-  const handleClick = (event) => {
+  const addName = (event) => {
     event.preventDefault();
-    if (personExists(newName)) {
-      alert(`${newName} is already added to phonebook`);
-      return;
-    }
+    const nameObject = {
+      name: newName,
+      number: newNumber,
+      id: persons.length + 1,
+    };
+
+    const existing_names = persons.map((person) => person.name);
 
     if (newName === "") {
       alert("Please enter a name");
       return;
     }
 
-    setPersons(persons.concat({ name: newName, number: newNumber, id: newName }));
+    // terminate if the name already exists, and the user doesn't want to replace/update the number
+    if (existing_names.includes(newName)) {
+      if (confirm(`${newName} is already added to the phonebook, replace the older number with a new one?`)) {
+      const existingPerson = persons.find((person) => person.name === newName);
+      const updatedPersonObject = { ...nameObject, id: `${existingPerson.id}` };
+
+      personService.update(
+        `${existingPerson.id}`,
+        updatedPersonObject
+      );
+      setNewName("");
+      event.target.reset();
+      return;
+      } else {
+      return;
+      }
+    }
+
+    setPersons(persons.concat(nameObject));
+    personService.add(nameObject);
     setNewName("");
     event.target.reset();
   };
@@ -65,7 +88,7 @@ const App = () => {
       <Filter filterPersons={filterPersons} />
       <h3>add a new</h3>
       <PersonForm
-        handleClick={handleClick}
+        handleClick={addName}
         handleNameChange={handleNameChange}
         handleNumberChange={handleNumberChange}
       ></PersonForm>

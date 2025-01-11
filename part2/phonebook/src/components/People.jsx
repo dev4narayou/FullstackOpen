@@ -1,11 +1,15 @@
-import Person from './Person';
+import React from 'react';
 
-const People = ({ persons, filteredPersons }) => {
-    return (
-        filteredPersons.map((person) => (
-            <Person key={person.id} person={person} />
-        ))
-    );
+const People = ({ persons }) => {
+  return (
+    <div>
+      {persons.map(person => (
+        <div key={person.id}>
+          {person.name} {person.number}
+        </div>
+      ))}
+    </div>
+  );
 };
 
 export default People;
