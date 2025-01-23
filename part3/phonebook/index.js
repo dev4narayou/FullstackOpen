@@ -35,6 +35,16 @@ app.get("/api/persons/:id", (request, response) => {
   }
 })
 
+app.delete("/api/persons/:id", (request, response) => {
+  const personTarget = persons.find((person) => person.id == request.params.id);
+  if (personTarget) {
+    persons = persons.filter((person) => person != personTarget);
+    response.status(204).end();
+  } else {
+    response.status(404).end()
+  }
+})
+
 app.get("/api/persons", (request, response) => {
   response.json(persons);
 });
