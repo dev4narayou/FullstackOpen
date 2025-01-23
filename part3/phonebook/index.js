@@ -49,6 +49,26 @@ app.get("/api/persons", (request, response) => {
   response.json(persons);
 });
 
+app.post("/api/persons", (request, response) => {
+  const body = request.body;
+  if (!body.name || !body.number) {
+    // incorrect syntax in request
+    return response.status(400).json({
+      error: "content missing",
+    });
+  }
+
+  const person = {
+    id: `${Math.round(Math.random() * 1000000)}`,
+    name: body.name,
+    number: `${body.number}`,
+  }
+
+  persons = persons.concat(person);
+  response.send(201);
+
+})
+
 app.get("/info", (request, response) => {
   const now = new Date();
   const weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
