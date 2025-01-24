@@ -26,19 +26,20 @@ let persons = [
   },
 ];
 
-// middleware
-const requestLogger = (request, response, next) => {
-  console.log("Method:", request.method);
-  console.log("Path:  ", request.path);
-  console.log("Body:  ", request.body);
-  console.log("---");
-  next();
-};
-// middleware is used like this
-app.use(requestLogger);
+// // middleware
+// const requestLogger = (request, response, next) => {
+//   console.log("Method:", request.method);
+//   console.log("Path:  ", request.path);
+//   console.log("Body:  ", request.body);
+//   console.log("---");
+//   next();
+// };
+// // middleware is used like this
+// app.use(requestLogger);
 
-
-
+// morgan middleware
+const morgan = require("morgan");
+app.use(morgan("tiny"));
 
 
 app.get("/api/persons/:id", (request, response) => {
