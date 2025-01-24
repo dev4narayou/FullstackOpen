@@ -26,6 +26,21 @@ let persons = [
   },
 ];
 
+// middleware
+const requestLogger = (request, response, next) => {
+  console.log("Method:", request.method);
+  console.log("Path:  ", request.path);
+  console.log("Body:  ", request.body);
+  console.log("---");
+  next();
+};
+// middleware is used like this
+app.use(requestLogger);
+
+
+
+
+
 app.get("/api/persons/:id", (request, response) => {
   const person = persons.find((person) => person.id == request.params.id);
   if (person) {
@@ -105,6 +120,14 @@ app.get("/info", (request, response) => {
     `
   );
 });
+
+
+// placing this middleware after the routes will make it run after the routes
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
+// use the middleware
+app.use(unknownEndpoint);
 
 const PORT = 3001;
 app.listen(PORT, () => {
