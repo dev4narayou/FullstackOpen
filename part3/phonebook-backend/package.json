@@ -1,0 +1,26 @@
+{
+  "name": "phonebook",
+  "version": "1.0.0",
+  "description": "phonebook part 3",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:ui": "rm -rf dist && cd ../phonebook-frontend/ && npm run build && cp -r dist ../phonebook-backend",
+    "deploy": "fly deploy",
+    "deploy:full": "npm run build:ui && npm run deploy",
+    "logs:prod": "fly logs"
+  },
+  "author": "Dev Narayan Manoj Kumar",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "^0.7.4",
+    "nodemon": "^3.1.9"
+  }
+}

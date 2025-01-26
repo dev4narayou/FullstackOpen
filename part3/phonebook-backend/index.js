@@ -1,7 +1,13 @@
 const express = require("express");
 const app = express();
+const path = require('path');
+const cors = require("cors");
+
 
 app.use(express.json());
+app.use(cors());
+
+app.use(express.static("dist")); // serves the frontend at the base url
 
 let persons = [
   {
@@ -93,7 +99,7 @@ app.post("/api/persons", (request, response) => {
   }
 
   persons = persons.concat(person);
-  response.send(201);
+  response.status(201).json(person);
 
 })
 
@@ -136,7 +142,12 @@ const unknownEndpoint = (request, response) => {
 // use the middleware
 app.use(unknownEndpoint);
 
-const PORT = 3001;
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+});
+
+
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
