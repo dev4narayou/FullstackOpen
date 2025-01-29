@@ -14,7 +14,6 @@ const url = `mongodb+srv://devmanojkumar08:${encodedPassword}@cluster0.mshgp.mon
   ?retryWrites=true&w=majority&appName=Cluster0`;
 
 mongoose.set("strictQuery", false);
-
 mongoose.connect(url);
 
 const noteSchema = new mongoose.Schema({

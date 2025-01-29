@@ -2,6 +2,6 @@ POST http://localhost:3001/api/notes
 Content-Type: application/json
 
 {
-  "content": "rest client is a handy tool",
-  "important": false
+  "content": "ensuring that stuff still works",
+  "important": true
 }
