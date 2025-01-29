@@ -15,7 +15,6 @@ mongoose.set("strictQuery", false);
 mongoose.connect(url);
 
 const personSchema = new mongoose.Schema({
-  id: String,
   name: String,
   number: String,
 });
@@ -29,7 +28,6 @@ if (process.argv.length == 5) {
   const number = process.argv[4];
 
   const person = new Person({
-    id: `${Math.round(Math.random() * 1000000)}`,
     name: `${name}`,
     number: `${number}`,
   });

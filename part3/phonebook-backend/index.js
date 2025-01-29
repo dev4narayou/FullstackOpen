@@ -1,36 +1,15 @@
 const express = require("express");
 const app = express();
-const path = require('path');
+require("dotenv").config();
+const path = require("path");
 const cors = require("cors");
 
+const Person = require("./models/person");
 
 app.use(express.json());
 app.use(cors());
 
 app.use(express.static("dist")); // serves the frontend at the base url
-
-let persons = [
-  {
-    id: "1",
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: "2",
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: "3",
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: "4",
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
 
 // // middleware
 // const requestLogger = (request, response, next) => {
@@ -46,35 +25,37 @@ let persons = [
 // morgan middleware
 const morgan = require("morgan");
 // app.use(morgan("tiny"));
-morgan.token('person', function (req, res) {
+morgan.token("person", function (req, res) {
   return JSON.stringify(req.body);
-})
-app.use(morgan(
-  `:method :url :status:res[content-length] - :response-time ms :person`
-));
-
-
-app.get("/api/persons/:id", (request, response) => {
-  const person = persons.find((person) => person.id == request.params.id);
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
-})
-
-app.delete("/api/persons/:id", (request, response) => {
-  const personTarget = persons.find((person) => person.id == request.params.id);
-  if (personTarget) {
-    persons = persons.filter((person) => person != personTarget);
-    response.status(204).end();
-  } else {
-    response.status(404).end()
-  }
-})
+});
+app.use(
+  morgan(`:method :url :status:res[content-length] - :response-time ms :person`)
+);
 
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
+  Person.find({}).then((persons) => {
+    response.json(persons);
+  });
+});
+
+app.get("/api/persons/:id", (request, response, next) => {
+  Person.findById(request.params.id)
+    .then((person) => {
+      if (!person) {
+        return response.status(404).json({ error: "person not found" });
+      }
+      response.json(person);
+    })
+    .catch(next);
+});
+
+app.delete("/api/persons/:id", (request, response, next) => {
+  const id = request.params.id;
+  Person.deleteOne({ _id: id })
+    .then(() => {
+      response.status(204).end();
+    })
+    .catch(next);
 });
 
 app.post("/api/persons", (request, response) => {
@@ -86,54 +67,77 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  if (persons.find((person) => person.name == body.name)) {
-    return response.status(400).json({
-      error: "name must be unique"
+  Person.findOne({ name: body.name }).then((existingPerson) => {
+    if (existingPerson) {
+      return response.status(400).json({
+        error: "name must be unique",
+      });
+    }
+
+    const person = new Person({
+      name: body.name,
+      number: body.number,
+    });
+
+    person.save().then((savedPerson) => {
+      response.status(201).json(savedPerson);
+    });
+  });
+});
+
+app.put("/api/persons/:id", (request, response) => {
+  const id = request.params.id;
+  const { name, number } = request.body;
+
+  Person.findByIdAndUpdate(
+    request.params.id,
+    { name, number },
+    { new: true, runValidators: true, context: "query" }
+  )
+    .then((updatedPerson) => {
+      response.json(updatedPerson);
     })
-  }
-
-  const person = {
-    id: `${Math.round(Math.random() * 1000000)}`,
-    name: body.name,
-    number: `${body.number}`,
-  }
-
-  persons = persons.concat(person);
-  response.status(201).json(person);
-
-})
+    .catch((error) => next(error));
+});
 
 app.get("/info", (request, response) => {
   const now = new Date();
   const weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const month = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
   // dates
   let m = month[now.getMonth()];
   let day = weekday[now.getDay()];
   const currentDate = `${
     day + " " + m + " " + now.getDate() + " " + now.getFullYear() + " "
-    }`;
+  }`;
 
   // time
-    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  response.send(
-    `
-    <div>
-      <p>
-        Phonebook has info for ${persons.length} persons
-      </p>
-      </div>
-    <div>
-      <p>
-        ${currentDate} (${timeZone})
-      </p>
-    </div>
-    `
-  );
+  Person.countDocuments({}).then((count) => {
+    response.send(
+      `<p>Phonebook has info for ${count} people</p><p>${currentDate}</p>`
+    );
+  });
 });
 
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "dist", "index.html"));
+});
 
 // placing this middleware after the routes will make it run after the routes
 const unknownEndpoint = (request, response) => {
@@ -142,10 +146,19 @@ const unknownEndpoint = (request, response) => {
 // use the middleware
 app.use(unknownEndpoint);
 
-app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
-});
+// custom error handler (defined after everything)
+const errorHandler = (err, req, res, next) => {
+  console.error(error.message);
 
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
+  }
+
+  next(err);
+};
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
