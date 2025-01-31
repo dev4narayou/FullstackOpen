@@ -11,7 +11,7 @@ app.use(cors());
 
 app.use(express.static("dist")); // serves the frontend at the base url
 
-// // middleware
+// middleware
 // const requestLogger = (request, response, next) => {
 //   console.log("Method:", request.method);
 //   console.log("Path:  ", request.path);
@@ -24,7 +24,7 @@ app.use(express.static("dist")); // serves the frontend at the base url
 
 // morgan middleware
 const morgan = require("morgan");
-// app.use(morgan("tiny"));
+app.use(morgan("tiny"));
 morgan.token("person", function (req, res) {
   return JSON.stringify(req.body);
 });
@@ -74,14 +74,22 @@ app.post("/api/persons", (request, response) => {
       });
     }
 
+    if (body.name.length < 3) {
+      return response.status(400).json({
+        error: "name must be at least 3 characters long",
+      });
+    }
+
     const person = new Person({
       name: body.name,
       number: body.number,
     });
 
-    person.save().then((savedPerson) => {
-      response.status(201).json(savedPerson);
-    });
+    person.save()
+      .then((savedPerson) => {
+        response.status(201).json(savedPerson);
+      })
+      .catch((error) => next(error));
   });
 });
 
@@ -148,12 +156,12 @@ app.use(unknownEndpoint);
 
 // custom error handler (defined after everything)
 const errorHandler = (err, req, res, next) => {
-  console.error(error.message);
+  console.error(err.message);
 
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
   } else if (error.name === "ValidationError") {
-    return response.status(400).json({ error: error.message });
+    return response.status(400).json({ error: err.message });
   }
 
   next(err);

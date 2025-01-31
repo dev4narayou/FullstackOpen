@@ -8,12 +8,6 @@ import Notification from "./components/Notification";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
-  // const [persons, setPersons] = useState([
-  //   { name: "Arto Hellas", number: "040-123456", id: 1 },
-  //   { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
-  //   { name: "Dan Abramov", number: "12-43-234345", id: 3 },
-  //   { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
-  // ]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
@@ -26,7 +20,7 @@ const App = () => {
     personService.getAll().then((initialPersons) => {
       setPersons(initialPersons);
     });
-  }, );
+  }, []);
 
   // for handling when name changes in the person form
   const handleNameChange = (event) => {
@@ -40,6 +34,7 @@ const App = () => {
 
   // for adding a new name to the phonebook
   const addName = (event) => {
+    console.log("addName called");
     event.preventDefault();
 
     if (newName === "") {
@@ -47,7 +42,24 @@ const App = () => {
       return;
     }
 
-  const newPerson = {
+    console.log(`newName: ${newName}`);
+
+    if (newName.length < 3) {
+      console.log("Name is too short");
+      setErrorColor("red");
+      setErrorMessage(
+        `Person validation failed: name: Path 'name' (${newName}) is shorter than the minimum allowed length (3).`
+      );
+      setTimeout(() => {
+        setErrorMessage(null);
+        setErrorColor(green); // Reset color after error
+      }, 5000);
+      setNewName(""); // Clear input
+      event.target.reset(); // Reset form
+      return;
+    }
+
+    const newPerson = {
       name: newName,
       number: newNumber,
       id: `${persons.length + 1}`,
@@ -103,28 +115,37 @@ const App = () => {
   // for deleting a name from the phonebook
   const deleteName = (person) => {
     const msg = `Delete ${person.name}?`;
-    const confirm = window.confirm(msg);
-
-    if (confirm) {
+    if (window.confirm(msg)) {
       personService
         .remove(person.id)
         .then(() => {
-          // re-fetch the data from the server
+          // Re-fetch ONLY after successful deletion
           personService.getAll().then((updatedPersons) => {
             setPersons(updatedPersons);
+            setErrorMessage(`${person.name} has been deleted from the phonebook`);
+            setTimeout(() => setErrorMessage(null), 5000);
           });
-          setErrorMessage(`${person.name} has been deleted from the phonebook`);
-          setTimeout(() => setErrorMessage(null), 5000);
         })
         .catch((error) => {
           setErrorColor("red");
-          setTimeout(() => {setErrorColor(green)}, 5000);
-          alert(
-            `The person '${person.name}' was already deleted from the server`
-          );
-          personService.getAll().then((updatedPersons) => {
-            setPersons(updatedPersons);
-          });
+          setTimeout(() => setErrorColor(green), 5000);
+
+          if (error.response.status === 404) {
+            // Check for "not found"
+            // Already deleted on the server; update UI directly
+            setPersons(persons.filter((p) => p.id !== person.id));
+            setErrorMessage(
+              `The person '${person.name}' was already deleted from the server`
+            );
+            setTimeout(() => setErrorMessage(null), 5000);
+          } else {
+            // Other errors
+            // eslint-disable-next-line
+            alert(`Error deleting ${person.name}: ${error.message}`); // display to user, give more context than before
+            // You might still want a refetch here depending on the nature
+            // of the error, but often it's not necessary.  If you do a
+            // refetch, be mindful of potential infinite loops as explained before
+          }
         });
     }
   };
