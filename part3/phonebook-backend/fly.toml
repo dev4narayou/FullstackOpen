@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for phonebook-backend-sparkling-log-4143 on 2025-01-26T19:10:11+11:00
+# fly.toml app configuration file generated for phonebook-backend-sparkling-log-4143 on 2025-02-01T01:41:44+11:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -9,7 +9,7 @@ primary_region = 'syd'
 [build]
 
 [env]
-  PORT = "3000"
+  PORT = '3000'
 
 [http_service]
   internal_port = 3000

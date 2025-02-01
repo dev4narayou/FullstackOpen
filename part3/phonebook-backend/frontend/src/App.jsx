@@ -34,15 +34,12 @@ const App = () => {
 
   // for adding a new name to the phonebook
   const addName = (event) => {
-    console.log("addName called");
     event.preventDefault();
 
     if (newName === "") {
       alert("Please enter a name");
       return;
     }
-
-    console.log(`newName: ${newName}`);
 
     if (newName.length < 3) {
       console.log("Name is too short");
@@ -66,8 +63,10 @@ const App = () => {
     };
     const existing_names = persons.map((person) => person.name);
 
+
     // call the seperate update function if the name already exists
-    if (existing_names.includes(newPerson)) {
+    if (existing_names.includes(newPerson.name)) {
+      console.log("Name already exists");
       updateName(newPerson);
       return; // if the function doesn't return (it does)
     }
@@ -78,7 +77,7 @@ const App = () => {
     }, 5000);
 
     setPersons(persons.concat(newPerson));
-    personService.add(newPerson);
+    personService.add(newPerson).then()
     setNewName("");
     event.target.reset();
   };
