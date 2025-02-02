@@ -25,7 +25,7 @@ app.use(express.static('dist')) // serves the frontend at the base url
 // morgan middleware
 const morgan = require('morgan')
 app.use(morgan('tiny'))
-morgan.token('person', function (req, res) {
+morgan.token('person', function (req) {
   return JSON.stringify(req.body)
 })
 app.use(
@@ -93,8 +93,8 @@ app.post('/api/persons', (request, response, next) => {
   })
 })
 
-app.put('/api/persons/:id', (request, response) => {
-  const id = request.params.id
+app.put('/api/persons/:id', (request, response, next) => {
+  // const id = request.params.id
   const { name, number } = request.body
 
   Person.findByIdAndUpdate(
@@ -134,7 +134,7 @@ app.get('/info', (request, response) => {
   }`
 
   // time
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  // const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
   Person.countDocuments({}).then((count) => {
     response.send(
@@ -158,10 +158,10 @@ app.use(unknownEndpoint)
 const errorHandler = (err, req, res, next) => {
   console.error(err.message)
 
-  if (error.name === 'CastError') {
-    return response.status(400).send({ error: 'malformatted id' })
-  } else if (error.name === 'ValidationError') {
-    return response.status(400).json({ error: err.message })
+  if (err.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' })
+  } else if (err.name === 'ValidationError') {
+    return res.status(400).json({ error: err.message })
   }
 
   next(err)
