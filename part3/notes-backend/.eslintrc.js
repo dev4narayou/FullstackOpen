@@ -25,6 +25,7 @@ module.exports = {
     ],
     'extends': 'eslint:recommended',
     'rules': {
+        'linebreak-style': 0,     // Disable linebreak-style checks
         '@stylistic/js/indent': [
             'error',
             2
