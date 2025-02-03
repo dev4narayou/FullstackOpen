@@ -3,6 +3,7 @@ const supertest = require("supertest");
 const app = require("../app");
 const api = supertest(app);
 const initialBlogs = require("./test_helper").initialBlogs;
+const helper = require("./test_helper");
 const mongoose = require("mongoose");
 
 const Blog = require("../models/blog");
@@ -97,7 +98,7 @@ test("verifies that when creating a new blog, if the title is missing, a 404 is 
   }
 
 
-test.only("verifies that deleting a single blog post works", async () => {
+test("verifies that deleting a single blog post works", async () => {
   const initialBlogsLength = (await Blog.find({})).length;
   const targetBlog = await Blog.findOne({ title: "Second Blog" }).exec();
   if (!targetBlog) {
@@ -108,6 +109,26 @@ test.only("verifies that deleting a single blog post works", async () => {
   assert.strictEqual((await Blog.find({})).length, initialBlogsLength - 1);
 
 })
+
+test('should update details of an existing blog successfully', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToBeUpdated = { ...blogsAtStart[0] }
+  blogToBeUpdated.likes++
+
+  await api
+    .put(`/api/blogs/${blogToBeUpdated.id}`)
+    .send(blogToBeUpdated)
+    .expect(200)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  assert.strictEqual(blogsAtEnd.length, blogsAtStart.length);
+
+  const updatedBlog = blogsAtEnd.find(
+    (blog) => blog.id === blogToBeUpdated.id
+  )
+  assert.deepEqual(updatedBlog, blogToBeUpdated)
+  })
+
 
 after(async () => {
   await mongoose.connection.close();
