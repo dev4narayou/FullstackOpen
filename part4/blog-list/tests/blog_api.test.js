@@ -49,7 +49,7 @@ test(
   }
 );
 
-test.only(
+test(
   "verifies that a blog can be correctly added to the db", async () => {
     const newBlog = {
       title: "verifying that a blog can be added to the db",
@@ -71,6 +71,18 @@ test.only(
     assert.strictEqual(retrievedBlogObject.likes, newBlog.likes);
   }
 )
+
+test.only("verifies that if the likes property is missing, it will default to 0", async () => {
+  const newBlog = Blog({
+    title: "no likes",
+    author: "author with no likes",
+    url: "http://example.com/with-no-likes",
+  });
+
+  await newBlog.save();
+  const retrievedBlogObject = await Blog.findOne({ title: "no likes" });
+  assert.strictEqual(retrievedBlogObject.likes, 0);
+});
 
 after(async () => {
   await mongoose.connection.close();
