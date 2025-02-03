@@ -23,6 +23,25 @@ test("all blogs are returned", async () => {
   assert.strictEqual(response.body.length, initialBlogs.length);
 });
 
+test(
+  "verifies that with an object w/ id, by default the database names the property _id.", async () => {
+    const object = Blog({
+      title: "blog with an id!",
+      author: "author with an id!",
+      url: "http://example.com/with-an-id",
+      likes: 101,
+      id: "this is an id"
+    })
+
+    await object.save();
+    const retrievedBlogObject = await Blog.findOne({ title: "blog with an id!" });
+    console.log(retrievedBlogObject);
+    assert.strictEqual(retrievedBlogObject._id.toString(), object.id);
+  }
+);
+
+test()
+
 after(async () => {
   await mongoose.connection.close();
 });

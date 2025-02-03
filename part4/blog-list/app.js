@@ -5,7 +5,7 @@ const cors = require("cors");
 const blogsRouter = require("./controllers/blogs");
 const mongoose = require("mongoose");
 
-const mongoUrl = `${process.env.MONGODB_URI}`;
+const mongoUrl = `${config.MONGODB_URI}`;
 mongoose.connect(mongoUrl).catch((error) => {
   console.error("error connecting to MongoDB:", error.message);
 });
