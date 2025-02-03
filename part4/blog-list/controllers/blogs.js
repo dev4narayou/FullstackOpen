@@ -15,4 +15,16 @@ blogsRouter.post("/", (request, response) => {
   });
 });
 
+blogsRouter.delete("/:id", (request, response) => {
+  const id = request.params.id;
+  Blog.findByIdAndDelete(id)
+    .then((result) => {
+      if (result) {
+        response.status(204).end();
+      } else {
+        response.status(404).end();
+      }
+    })
+});
+
 module.exports = blogsRouter;

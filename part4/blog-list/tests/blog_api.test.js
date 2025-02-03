@@ -84,7 +84,7 @@ test("verifies that if the likes property is missing, it will default to 0", asy
   assert.strictEqual(retrievedBlogObject.likes, 0);
 });
 
-test.only("verifies that when creating a new blog, if the title is missing, a 404 is returned"),
+test("verifies that when creating a new blog, if the title is missing, a 404 is returned"),
   async () => {
     const testBlog = Blog({
       author: "test author",
@@ -95,6 +95,19 @@ test.only("verifies that when creating a new blog, if the title is missing, a 40
     const res = await testBlog.save();
     assert.strictEqual(res.status, 404);
   }
+
+
+test.only("verifies that deleting a single blog post works", async () => {
+  const initialBlogsLength = (await Blog.find({})).length;
+  const targetBlog = await Blog.findOne({ title: "Second Blog" }).exec();
+  if (!targetBlog) {
+    throw new Error("Target blog not found");
+  }
+
+  await api.delete(`/api/blogs/${targetBlog.id}`).expect(204);
+  assert.strictEqual((await Blog.find({})).length, initialBlogsLength - 1);
+
+})
 
 after(async () => {
   await mongoose.connection.close();
