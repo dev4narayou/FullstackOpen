@@ -72,7 +72,7 @@ test(
   }
 )
 
-test.only("verifies that if the likes property is missing, it will default to 0", async () => {
+test("verifies that if the likes property is missing, it will default to 0", async () => {
   const newBlog = Blog({
     title: "no likes",
     author: "author with no likes",
@@ -83,6 +83,18 @@ test.only("verifies that if the likes property is missing, it will default to 0"
   const retrievedBlogObject = await Blog.findOne({ title: "no likes" });
   assert.strictEqual(retrievedBlogObject.likes, 0);
 });
+
+test.only("verifies that when creating a new blog, if the title is missing, a 404 is returned"),
+  async () => {
+    const testBlog = Blog({
+      author: "test author",
+      url: "http://testauthor.com",
+      likes: 11
+    })
+
+    const res = await testBlog.save();
+    assert.strictEqual(res.status, 404);
+  }
 
 after(async () => {
   await mongoose.connection.close();
