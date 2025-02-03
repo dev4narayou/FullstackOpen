@@ -18,6 +18,15 @@ beforeEach(async () => {
   }
 });
 
+"verifies that a blog can be correctly added to the db", async () => {
+  const newBlog = {
+    title: "verifying that a blog can be added to the db",
+    author:"author of the blog",
+    url: "http://example.com/with-an-id",
+    likes: 101,
+
+  }
+}
 test("all blogs are returned", async () => {
   const response = await api.get("/api/blogs");
   assert.strictEqual(response.body.length, initialBlogs.length);
@@ -40,7 +49,28 @@ test(
   }
 );
 
-test()
+test.only(
+  "verifies that a blog can be correctly added to the db", async () => {
+    const newBlog = {
+      title: "verifying that a blog can be added to the db",
+      author:"author of the blog",
+      url: "http://example.com/with-an-id",
+      likes: 1312
+    }
+
+    const numPrevBlogs = (await Blog.find({})).length;
+
+    const res = await api.post("/api/blogs").send(newBlog);
+    assert.strictEqual(res.status, 201);
+    assert.strictEqual(numPrevBlogs + 1, (await Blog.find({})).length);
+
+    const retrievedBlogObject = await Blog.findOne({ title: "verifying that a blog can be added to the db" });
+    assert.strictEqual(retrievedBlogObject.title, newBlog.title);
+    assert.strictEqual(retrievedBlogObject.author, newBlog.author);
+    assert.strictEqual(retrievedBlogObject.url, newBlog.url);
+    assert.strictEqual(retrievedBlogObject.likes, newBlog.likes);
+  }
+)
 
 after(async () => {
   await mongoose.connection.close();
