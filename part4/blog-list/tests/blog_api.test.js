@@ -19,15 +19,16 @@ beforeEach(async () => {
   }
 });
 
-"verifies that a blog can be correctly added to the db", async () => {
+test("verifies that a blog can be correctly added to the db", async () => {
   const newBlog = {
     title: "verifying that a blog can be added to the db",
-    author:"author of the blog",
+    author: "author of the blog",
     url: "http://example.com/with-an-id",
     likes: 101,
 
   }
-}
+});
+
 test("all blogs are returned", async () => {
   const response = await api.get("/api/blogs");
   assert.strictEqual(response.body.length, initialBlogs.length);
