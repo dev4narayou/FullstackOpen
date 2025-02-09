@@ -3,8 +3,8 @@ Content-Type: application/json
 Authorization: Bearer token
 
 {
-  "title": "blog title2",
-  "author": "author name2",
+  "title": "blog title3",
+  "author": "author name3",
   "url": "http://localhost:3003/api/blogs",
-  "likes": 2
+  "likes": 3
 }
