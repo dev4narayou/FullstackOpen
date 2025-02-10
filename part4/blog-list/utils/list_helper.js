@@ -13,6 +13,9 @@ const totalLikes = (blogs) => {
 };
 
 const favoriteBlog = (blogs) => {
+  if (blogs.length === 0) {
+    return {};
+  }
   const blogMaxLikes = blogs.reduce((maxValue, current) =>
     current.likes >= maxValue.likes ? current : maxValue
   );
@@ -22,6 +25,9 @@ const favoriteBlog = (blogs) => {
 };
 
 const mostBlogs = (blogs) => {
+  if (blogs.length === 0) {
+    return null;
+  }
   const groupAuthor = _.map(_.groupBy(blogs, "author"), (elements) => ({
     author: elements[0].author,
     blogs: elements.length,
@@ -34,6 +40,9 @@ const mostBlogs = (blogs) => {
 };
 
 const mostLikes = (blogs) => {
+  if (blogs.length === 0) {
+    return null;
+  }
   const groupAuthor = _.map(_.groupBy(blogs, "author"), (elements) => ({
     author: elements[0].author,
     likes: totalLikes(elements),
@@ -47,11 +56,12 @@ const mostLikes = (blogs) => {
 
 const searchIdByTitle = (blogs, title) => {
   const findBlog = blogs.find((blog) => blog.title === title);
-  if (!findBlog.id) {
+  if (!findBlog || !findBlog.id) {
     return -1;
   }
   return findBlog.id;
 };
+
 module.exports = {
   dummy,
   totalLikes,

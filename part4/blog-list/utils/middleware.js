@@ -34,24 +34,34 @@ const tokenExtractor = (request, response, next) => {
   next();
 }
 
+const getToken = (request) => {
+  const authorization = request.get("authorization");
+  if (authorization && authorization.startsWith("Bearer ")) {
+    request.token = authorization.replace("Bearer ", "");
+  }
+}
+
+// sets the User object to the request.user variable
+// to be used specifically with certain routes, thus can't assume that the token is set
 const userExtractor = async (request, response, next) => {
-  const token = request.token;
-  if (!token) {
-    next();
-    return;
+  getToken(request);
+  if (!request.token) {
+    return response.status(401).send(); // unauthorized / unauthenticated
   }
 
-  const decodedToken = jwt.verify(token, process.env.SECRET);
+  const decodedToken = jwt.verify(request.token, process.env.SECRET);
   const userid = decodedToken.id;
   const user = await User.findById(userid);
+  // if the user corresponding to the token is not found in the database, it still means the authentication process has failed.
+  // The client has provided credentials, but they do not correspond to a valid user. Therefore, a 401 Unauthorized status code is still appropriate.
   if (!user) {
-    response.status(404).send();
+    return response.status(401).json({ error: "user not found" });
   }
 
   request.user = user;
-  console.log(user);
   next();
 }
+
 
 module.exports = {
   requestLogger,
