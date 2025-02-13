@@ -1,10 +1,13 @@
-const NoteForm = (props) => {
-  const { addNote, newNote, handleNoteChange } = props;
+const NoteForm = ({ onSubmit, handleChange, value }) => {
   return (
-    <form onSubmit={addNote}>
-      <input value={newNote} onChange={handleNoteChange} />
-      <button type="submit">save</button>
-    </form>
+    <div>
+      <h2>Create a new note</h2>
+
+      <form onSubmit={onSubmit}>
+        <input value={value} onChange={handleChange} />
+        <button type="submit">save</button>
+      </form>
+    </div>
   );
 };
 
