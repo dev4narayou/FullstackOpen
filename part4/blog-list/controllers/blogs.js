@@ -11,6 +11,7 @@ blogsRouter.get("/", async (request, response) => {
 });
 
 blogsRouter.post("/", userExtractor, async (request, response) => {
+  console.log("here")
   const { title, author, url, likes } = request.body;
 
   if (!request.user) {
