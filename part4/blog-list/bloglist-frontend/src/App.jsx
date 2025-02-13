@@ -13,6 +13,7 @@ const App = () => {
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null); // the returned object when logging in (jwt, username, user name)
   const [errorMessage, setErrorMessage] = useState(null);
+  const [errorColor, setErrorColor] = useState(null);
 
   // blog creation related variables
   const [title, setTitle] = useState(null);
@@ -40,12 +41,14 @@ const App = () => {
 
   const submitBlog = async (event) => {
     event.preventDefault();
-    const res = await blogService.create({ title, author, url });
-    setBlogs(blogs.concat(res));
+    const newBlog = await blogService.create({ title, author, url });
+    setBlogs(blogs.concat(newBlog));
     resetBlogForm;
+    setErrorColor("green");
     setErrorMessage(`Added blog ${newBlog.title} by ${newBlog.author}`);
     setTimeout(() => {
       setErrorMessage(null);
+      setErrorColor("red");
     }, 5000);
   };
 
@@ -87,8 +90,8 @@ const App = () => {
           "loggedBlogappUser",
           JSON.stringify(response)
         );
-        setUsername('');
-        setPassword('');
+        setUsername("");
+        setPassword("");
       }
     } catch (error) {
       // console.log('Login error:', error);
@@ -106,7 +109,7 @@ const App = () => {
 
   return (
     <div>
-      <Notification message={errorMessage} />
+      <Notification message={errorMessage} color={errorColor} />
 
       {user == null ? (
         <LoginForm
