@@ -1,7 +1,28 @@
-const BlogForm = ({ handleSubmit, title, author, url , setTitle, setAuthor, setUrl}) => {
+import { useState } from "react";
+
+const BlogForm = ({ createBlog }) => {
+
+  // blog creation related variables
+  const [title, setTitle] = useState(null);
+  const [author, setAuthor] = useState(null);
+  const [url, setUrl] = useState(null);
+
+  const resetBlogForm = () => {
+    setTitle(null);
+    setAuthor(null);
+    setUrl(null);
+  };
+
+  const submitBlog = async (event) => {
+    event.preventDefault();
+    const newBlog = await createBlog({ title, author, url });
+    resetBlogForm();
+
+  };
+
   return (
     <div>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={submitBlog}>
         <label for="title">title</label>
         <input
           type="text"
