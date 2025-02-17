@@ -44,12 +44,36 @@ const App = () => {
     }, 5000);
   };
 
+  const handleBlogRemoval = async (id) => {
+    try {
+      const deletedID = await blogService.remove(id);
+      setBlogs(blogs.filter((blog) => blog.id !== deletedID));
+      setErrorMessage("Blog was removed successfully");
+      setErrorColor("green");
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    } catch (error) {
+      setErrorMessage("Failed to remove blog");
+      setErrorColor("red");
+      setTimeout(() => {
+        setErrorMessage(null);
+      }, 5000);
+    }
+  };
+
   const Blogs = () => (
     <>
       {blogs
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
-          <Blog key={blog.id} blog={blog} updateBlog={handleBlogUpdate} />
+          <Blog
+            key={blog.id}
+            blog={blog}
+            updateBlog={handleBlogUpdate}
+            removeBlog={handleBlogRemoval}
+            viewingUser={user.name}
+          />
         ))}
     </>
   );

@@ -1,6 +1,6 @@
 import { useState, forwardRef } from "react";
 
-const Blog = forwardRef(({ blog, updateBlog }) => {
+const Blog = forwardRef(({ blog, updateBlog, removeBlog, viewingUser }) => {
   const [visible, setVisible] = useState(false);
 
   const toggleVisibility = () => {
@@ -13,6 +13,12 @@ const Blog = forwardRef(({ blog, updateBlog }) => {
       likes: blog.likes + 1,
     });
   };
+
+  const handleRemove = () => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      removeBlog(blog.id);
+    }
+  }
 
   const hideWhenVisible = { display: visible ? "none" : "" };
   const showWhenVisible = { display: visible ? "" : "none" };
@@ -41,6 +47,10 @@ const Blog = forwardRef(({ blog, updateBlog }) => {
         <button onClick={handleLike}>like</button>
         <br></br>
         {blog.author}
+        <br></br>
+        {blog.author === viewingUser && (
+          <button onClick={handleRemove}>remove</button>
+        )}
       </div>
     </div>
   );
