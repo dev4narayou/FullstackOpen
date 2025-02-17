@@ -1,11 +1,11 @@
 const LoginForm = (props) => {
-  const { setUsername, setPassword, username, password, handleLogin } = props;
+  const { setUsername, setPassword, username, password, handleLogin } = props
 
   return (
     <div>
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
-        <label for="username">username</label>
+        <label htmlFor="username">username</label>
         <br />
         <input
           type="text"
@@ -14,7 +14,7 @@ const LoginForm = (props) => {
           onChange={({ target }) => setUsername(target.value)}
         />
         <br />
-        <label for="password">password</label>
+        <label htmlFor="password">password</label>
         <br />
         <input
           type="text"
@@ -26,7 +26,7 @@ const LoginForm = (props) => {
         <button type="submit"> Submit </button>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default LoginForm;
+export default LoginForm

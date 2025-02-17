@@ -1,33 +1,33 @@
-import { useState, useEffect, useRef } from "react";
-import Blog from "./components/Blog";
-import blogService from "./services/blogs";
-import loginService from "./services/login";
+import { useState, useEffect, useRef } from 'react'
+import Blog from './components/Blog'
+import blogService from './services/blogs'
+import loginService from './services/login'
 
-import LoginForm from "./components/LoginForm";
-import BlogForm from "./components/BlogForm";
-import Notification from "./components/Notification";
-import Togglable from "./components/Togglable";
+import LoginForm from './components/LoginForm'
+import BlogForm from './components/BlogForm'
+import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null); // the returned object when logging in (jwt, username, user name)
-  const [errorMessage, setErrorMessage] = useState(null);
-  const [errorColor, setErrorColor] = useState(null);
+  const [blogs, setBlogs] = useState([])
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [user, setUser] = useState(null) // the returned object when logging in (jwt, username, user name)
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [errorColor, setErrorColor] = useState(null)
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+    blogService.getAll().then((blogs) => setBlogs(blogs))
+  }, [])
 
   // for storing login in the browser
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON);
-      setUser(user);
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
     }
-  }, []);
+  }, [])
 
   const Blogs = () => (
     <>
@@ -36,37 +36,37 @@ const App = () => {
         <Blog key={blog.id} blog={blog} />
       ))}
     </>
-  );
+  )
 
   const handleLogin = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
     try {
-      const response = await loginService.login({ username, password });
+      const response = await loginService.login({ username, password })
       if (response) {
-        setUser(response);
-        blogService.setToken(response.token);
+        setUser(response)
+        blogService.setToken(response.token)
         window.localStorage.setItem(
-          "loggedBlogappUser",
+          'loggedBlogappUser',
           JSON.stringify(response)
-        );
-        setUsername("");
-        setPassword("");
+        )
+        setUsername('')
+        setPassword('')
       }
     } catch (error) {
       // console.log('Login error:', error);
-      setErrorMessage(error.response?.data?.error || "Wrong credentials");
+      setErrorMessage(error.response?.data?.error || 'Wrong credentials')
       setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
+        setErrorMessage(null)
+      }, 5000)
     }
-  };
+  }
 
   const handleLogout = () => {
-    window.localStorage.removeItem("loggedBlogappUser");
-    setUser(null);
-  };
+    window.localStorage.removeItem('loggedBlogappUser')
+    setUser(null)
+  }
 
-  const blogFormRef = useRef();
+  const blogFormRef = useRef()
 
   const blogForm = () => {
     return (
@@ -76,20 +76,20 @@ const App = () => {
           <BlogForm createBlog={addBlog} />
         </Togglable>
       </div>
-    );
-  };
+    )
+  }
 
   const addBlog = async (blogObject) => {
-    blogFormRef.current.toggleVisibility();
+    blogFormRef.current.toggleVisibility()
     const newBlog = await blogService.create(blogObject)
-    setBlogs(blogs.concat(newBlog));
-    setErrorColor("green");
-    setErrorMessage(`Added blog ${newBlog.title} by ${newBlog.author}`);
+    setBlogs(blogs.concat(newBlog))
+    setErrorColor('green')
+    setErrorMessage(`Added blog ${newBlog.title} by ${newBlog.author}`)
     setTimeout(() => {
-      setErrorMessage(null);
-      setErrorColor("red");
-    }, 5000);
-  };
+      setErrorMessage(null)
+      setErrorColor('red')
+    }, 5000)
+  }
 
   return (
     <div>
@@ -105,7 +105,7 @@ const App = () => {
 
       {user && blogForm()}
 
-      {user == null && (
+      {user === null && (
         <LoginForm
           username={username}
           password={password}
@@ -117,7 +117,7 @@ const App = () => {
 
       {user !== null && <Blogs />}
     </div>
-  );
-};
+  )
+}
 
-export default App;
+export default App
