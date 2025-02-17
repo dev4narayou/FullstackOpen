@@ -1,17 +1,32 @@
-import {useState, forwardRef} from 'react';
+import { useState, forwardRef } from "react";
 
-const Blog = forwardRef(({ blog }) => {
+const Blog = forwardRef(({ blog, updateBlog }) => {
   const [visible, setVisible] = useState(false);
 
   const toggleVisibility = () => {
     setVisible(!visible);
   };
 
+  const handleLike = () => {
+    updateBlog(blog.id, {
+      ...blog,
+      likes: blog.likes + 1,
+    });
+  };
+
   const hideWhenVisible = { display: visible ? "none" : "" };
   const showWhenVisible = { display: visible ? "" : "none" };
 
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: "solid",
+    borderWidth: 1,
+    marginBottom: 5,
+  };
+
   return (
-    <div style={{ border: "1px solid black", padding: "5px", margin: "5px" }}>
+    <div style={blogStyle}>
       <div style={showWhenVisible}>
         {blog.title} {blog.author}
         <button onClick={toggleVisibility}>view</button>
@@ -23,6 +38,7 @@ const Blog = forwardRef(({ blog }) => {
         {blog.url}
         <br></br>
         {blog.likes}
+        <button onClick={handleLike}>like</button>
         <br></br>
         {blog.author}
       </div>

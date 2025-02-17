@@ -29,11 +29,25 @@ const App = () => {
     }
   }, []);
 
+  const handleBlogUpdate = async (id, updatedBlog) => {
+    try {
+      const updated = await blogService.update(id, updatedBlog);
+      setBlogs(blogs.map((blog) => (blog.id === id ? updated : blog)));
+      setErrorMessage(`Blog ${updated.title} was updated successfully`);
+      setErrorColor("green");
+    } catch (error) {
+      setErrorMessage("Failed to update blog");
+      setErrorColor("red");
+    }
+    setTimeout(() => {
+      setErrorMessage(null);
+    }, 5000);
+  };
+
   const Blogs = () => (
     <>
-      {/* displays the blogs */}
       {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} updateBlog={handleBlogUpdate} />
       ))}
     </>
   );
@@ -81,7 +95,7 @@ const App = () => {
 
   const addBlog = async (blogObject) => {
     blogFormRef.current.toggleVisibility();
-    const newBlog = await blogService.create(blogObject)
+    const newBlog = await blogService.create(blogObject);
     setBlogs(blogs.concat(newBlog));
     setErrorColor("green");
     setErrorMessage(`Added blog ${newBlog.title} by ${newBlog.author}`);
