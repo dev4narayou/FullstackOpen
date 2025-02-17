@@ -65,7 +65,6 @@ blogsRouter.delete("/:id", userExtractor, async (request, response) => {
   response.status(204).end();
 });
 
-// route to update an existing blog post with new data
 blogsRouter.put("/:id", userExtractor, async (request, response) => {
   try {
     const body = request.body;
