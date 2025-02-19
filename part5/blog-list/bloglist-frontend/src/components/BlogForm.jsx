@@ -3,14 +3,14 @@ import { useState } from "react";
 const BlogForm = ({ createBlog }) => {
 
   // blog creation related variables
-  const [title, setTitle] = useState(null);
-  const [author, setAuthor] = useState(null);
-  const [url, setUrl] = useState(null);
+  const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [url, setUrl] = useState('');
 
   const resetBlogForm = () => {
-    setTitle(null);
-    setAuthor(null);
-    setUrl(null);
+    setTitle('');
+    setAuthor('');
+    setUrl('');
   };
 
   const submitBlog = async (event) => {
@@ -23,24 +23,29 @@ const BlogForm = ({ createBlog }) => {
   return (
     <div>
       <form onSubmit={submitBlog}>
-        <label for="title">title</label>
+        <label htmlFor="title">title</label>
         <input
           type="text"
           name="title"
+          id="title"
           value={title}
           onChange={({ target }) => setTitle(target.value)}
         />
         <br></br>
-        <label for="author">author</label>
+        <label htmlFor="author">author</label>
         <input
           type="text"
+          name="author"
+          id="author"
           value={author}
           onChange={({ target }) => setAuthor(target.value)}
         />
         <br></br>
-        <label for="url">url</label>
+        <label htmlFor="url">url</label>
         <input
           type="text"
+          name="url"
+          id="url"
           value={url}
           onChange={({ target }) => setUrl(target.value)}
         />
