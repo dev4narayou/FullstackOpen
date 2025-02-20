@@ -7,7 +7,8 @@
     "dev": "cross-env NODE_ENV=production nodemon index.js",
     "start": "cross-env NODE_ENV=production node index.js",
     "test": "cross-env NODE_ENV=production node --test",
-    "debug": "nodemon --inspect index.js"
+    "debug": "nodemon --inspect index.js",
+    "start:test": "NODE_ENV=test node index.js"
   },
   "author": "",
   "license": "ISC",

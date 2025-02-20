@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import PropTypes from 'prop-types'
 
 const NoteForm = ({ createNote }) => {
   const [newNote, setNewNote] = useState('')
@@ -21,18 +20,14 @@ const NoteForm = ({ createNote }) => {
       <form onSubmit={addNote}>
         <input
           value={newNote}
+          data-testid='note-input'
           onChange={event => setNewNote(event.target.value)}
+          placeholder='write note content here'
         />
         <button type="submit">save</button>
       </form>
     </div>
   )
-}
-
-NoteForm.displayName = 'NoteForm'
-
-NoteForm.propTypes = {
-  createNote: PropTypes.func.isRequired
 }
 
 export default NoteForm
