@@ -13,3 +13,5 @@ export default defineConfig({
     }
   },
 })
+
+console.log('Vite config loaded with proxy settings')
