@@ -3,15 +3,15 @@ const { loginWith, createNote } = require('./helper')
 
 describe('Note app', () => {
   beforeEach(async ({ page, request }) => {
-    await request.post('http://localhost:3001/api/testing/reset')
-    await request.post('http://localhost:3001/api/users', {
+    await request.post('/api/testing/reset')
+    await request.post('/api/users', {
       data: {
         name: 'Dev K',
         username: 'dev4narayou',
         password: 'devspassword'
       }
     })
-    await page.goto('http://localhost:5173')
+    await page.goto('/')
   })
 
   test('front page can be opened', async ({ page }) => {
@@ -23,6 +23,22 @@ describe('Note app', () => {
   test('login form can be opened', async ({ page }) => {
     await loginWith(page, 'dev4narayou', 'devspassword')
     await expect(page.getByText('Dev K logged in')).toBeVisible()
+  })
+
+  test("login fails with wrong password", async ({ page }) => {
+    await page.getByRole("button", { name: "log in" }).click();
+    await page.getByTestId("username").fill("mluukkai");
+    await page.getByTestId("password").fill("wrong");
+    await page.getByRole("button", { name: "login" }).click();
+
+    const errorDiv = await page.locator(".error");
+    await expect(errorDiv).toContainText("wrong credentials");
+    await expect(errorDiv).toHaveCSS("border-style", "solid");
+    await expect(errorDiv).toHaveCSS("color", "rgb(255, 0, 0)");
+
+    await expect(
+      page.getByText("Matti Luukkainen logged in")
+    ).not.toBeVisible()
   })
 
   describe('when logged in', () => {
@@ -38,30 +54,32 @@ describe('Note app', () => {
 
     describe('and a note exists', () => {
       beforeEach(async ({ page }) => {
-        await createNote(page, 'another note by playwright')
+        await createNote(page, "first note");
+        await createNote(page, "second note");
+        await createNote(page, "third note");
       })
 
       test('importance can be changed', async ({ page }) => {
-        await page.getByRole('button', { name: 'make not important' }).click()
-        await expect(page.getByText('make important')).toBeVisible()
+        const otherNoteText = await page.getByText("second note");
+        const otherNoteElement = await otherNoteText.locator("..");
+
+        await otherNoteElement
+          .getByRole("button", { name: "make not important" })
+          .click();
+        await expect(
+          otherNoteElement.getByText("make important")
+        ).toBeVisible();
+      })
+
+      test('one of those can be made nonimportant', async ({ page }) => {
+        await page.pause()
+        const otherNoteText = await page.getByText('second note')
+        const otherNoteElement = await otherNoteText.locator('..')
+
+        await otherNoteElement.getByRole('button', { name: 'make not important' }).click()
+        await expect(otherNoteElement.getByText('make important')).toBeVisible()
       })
     })
   })
-
-  test('login fails with wrong password', async ({ page }) => {
-    await page.getByRole('button', { name: 'log in' }).click()
-    await page.getByTestId('username').fill('mluukkai')
-    await page.getByTestId('password').fill('wrong')
-    await page.getByRole('button', { name: 'login' }).click()
-
-    const errorDiv = await page.locator('.error')
-    await expect(errorDiv).toContainText('wrong credentials')
-    await expect(errorDiv).toHaveCSS('border-style', 'solid')
-    await expect(errorDiv).toHaveCSS('color', 'rgb(255, 0, 0)')
-
-
-    await expect(page.getByText('Matti Luukkainen logged in')).not.toBeVisible()
-  })
-
 })
 
