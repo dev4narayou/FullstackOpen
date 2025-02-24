@@ -8,6 +8,7 @@ const LoginForm = (props) => {
         <label for="username">username</label>
         <br />
         <input
+          data-testid="username"
           type="text"
           name="username"
           value={username}
@@ -17,6 +18,7 @@ const LoginForm = (props) => {
         <label for="password">password</label>
         <br />
         <input
+          data-testid="password"
           type="text"
           name="password"
           value={password}
