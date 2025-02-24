@@ -36,4 +36,25 @@ describe("Blog app", () => {
       await expect(locator).toBeVisible();
     });
   });
+
+  describe("When logged in", () => {
+    beforeEach(async ({ page }) => {
+      await page.getByTestId("username").fill("fakeme");
+      await page.getByTestId("password").fill("fakepassword");
+      await page.getByRole("button", { name: "submit" }).click();
+    });
+
+    test("a new blog can be created", async ({ page }) => {
+      await page.getByRole("button", { name: "new blog" }).click();
+      await page.getByTestId("title").fill("a title");
+      await page.getByTestId("author").fill("an author");
+      await page.getByTestId("url").fill("a url");
+      await page.getByRole("button", { name: "create" }).click();
+      // the message is displayed
+      await expect(page.getByText("Added blog a title by an author")).toBeVisible();
+      // the blog is displayed
+      await expect(page.getByText("a title an author")).toBeVisible();
+
+    });
+  });
 });
