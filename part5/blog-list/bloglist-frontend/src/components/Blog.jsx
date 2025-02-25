@@ -38,7 +38,7 @@ const Blog = forwardRef(({ blog, updateBlog, removeBlog, viewingUser, visibility
         <br></br>
         {blog.url}
         <br></br>
-        likes {blog.likes}
+        <span data-testid="like-count">likes {blog.likes}</span>
         <button onClick={handleLike}>like</button>
         <br></br>
         {blog.author}

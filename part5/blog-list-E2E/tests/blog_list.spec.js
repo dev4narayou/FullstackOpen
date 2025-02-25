@@ -15,7 +15,6 @@ describe("Blog app", () => {
   });
 
   test("Login form is shown", async ({ page }) => {
-    // await page.getByRole("button", { name: "login" }).click();
     await expect(page.getByTestId("username")).toBeVisible();
     await expect(page.getByTestId("password")).toBeVisible();
   });
@@ -32,8 +31,9 @@ describe("Blog app", () => {
       await page.getByTestId("username").fill("wrongusername");
       await page.getByTestId("password").fill("wrongpassword");
       await page.getByRole("button", { name: "submit" }).click();
-      const locator = await page.getByText("invalid username or password");
-      await expect(locator).toBeVisible();
+      await expect(
+        page.getByText("invalid username or password")
+      ).toBeVisible();
     });
   });
 
@@ -50,12 +50,12 @@ describe("Blog app", () => {
       await page.getByTestId("author").fill("an author");
       await page.getByTestId("url").fill("a url");
       await page.getByRole("button", { name: "create" }).click();
-      // the message is displayed
-      await expect(page.getByText("Added blog a title by an author")).toBeVisible();
-      // the blog is displayed
+      await expect(
+        page.getByText("Added blog a title by an author")
+      ).toBeVisible();
       await expect(page.getByText("a title an author")).toBeVisible();
-
     });
+
     describe("When a blog exists", () => {
       beforeEach(async ({ page }) => {
         await page.getByRole("button", { name: "new blog" }).click();
@@ -78,7 +78,47 @@ describe("Blog app", () => {
         await expect(
           page.getByText("Blog was removed successfully")
         ).toBeVisible();
-        await expect(page.getByText("a title fakename").isHidden()).toBeTruthy();
+        await expect(
+          page.getByText("a title fakename").isHidden()
+        ).toBeTruthy();
+      });
+    });
+
+    describe("When multiple blogs exist", () => {
+      beforeEach(async ({ page }) => {
+        await page.getByRole("button", { name: "new blog" }).click();
+        await page.getByTestId("title").fill("a title");
+        await page.getByTestId("author").fill("fakename");
+        await page.getByTestId("url").fill("a url");
+        await page.getByRole("button", { name: "create" }).click();
+
+        await page.getByRole("button", { name: "new blog" }).click();
+        await page.getByTestId("title").fill("another title");
+        await page.getByTestId("author").fill("fakename");
+        await page.getByTestId("url").fill("another url");
+        await page.getByRole("button", { name: "create" }).click();
+
+        await page.getByRole("button", { name: "new blog" }).click();
+        await page.getByTestId("title").fill("yet another title");
+        await page.getByTestId("author").fill("fakename");
+        await page.getByTestId("url").fill("yet another url");
+        await page.getByRole("button", { name: "create" }).click();
+      });
+
+      test("blogs are ordered by likes", async ({ page }) => {
+        const locator = await page.getByRole("button", { name: "view" });
+        const blogs = await locator.all();
+        blogs.forEach((element) => {
+          element.click();
+        });
+        const likeCountSpans = await page.getByTestId("like-count").all();
+        const likeCounts = await Promise.all(
+          likeCountSpans.map(async (span) => {
+            return parseInt((await span.innerText()).replace("likes ", ""), 10);
+          })
+        );
+        const sortedLikeCounts = [...likeCounts].sort((a, b) => b - a);
+        expect(likeCounts).toEqual(sortedLikeCounts);
       });
     });
   });
