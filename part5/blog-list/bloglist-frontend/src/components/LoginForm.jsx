@@ -5,7 +5,7 @@ const LoginForm = (props) => {
     <div>
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
-        <label for="username">username</label>
+        <label htmlFor="username">username</label>
         <br />
         <input
           data-testid="username"

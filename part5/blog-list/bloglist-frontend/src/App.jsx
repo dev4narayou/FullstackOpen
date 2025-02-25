@@ -15,6 +15,7 @@ const App = () => {
   const [user, setUser] = useState(null); // the returned object when logging in (jwt, username, user name)
   const [errorMessage, setErrorMessage] = useState(null);
   const [errorColor, setErrorColor] = useState(null);
+  const [visibleBlogs, setVisibleBlogs] = useState({});
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -62,6 +63,13 @@ const App = () => {
     }
   };
 
+  const toggleBlogVisibility = (id) => {
+    setVisibleBlogs({
+      ...visibleBlogs,
+      [id]: !visibleBlogs[id],
+    });
+  };
+
   const Blogs = () => (
     <>
       {blogs
@@ -73,6 +81,8 @@ const App = () => {
             updateBlog={handleBlogUpdate}
             removeBlog={handleBlogRemoval}
             viewingUser={user.name}
+            visibility={visibleBlogs[blog.id]}
+            toggleVisibility={() => toggleBlogVisibility(blog.id)}
           />
         ))}
     </>

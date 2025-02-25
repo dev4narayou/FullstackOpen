@@ -56,5 +56,30 @@ describe("Blog app", () => {
       await expect(page.getByText("a title an author")).toBeVisible();
 
     });
+    describe("When a blog exists", () => {
+      beforeEach(async ({ page }) => {
+        await page.getByRole("button", { name: "new blog" }).click();
+        await page.getByTestId("title").fill("a title");
+        await page.getByTestId("author").fill("fakename");
+        await page.getByTestId("url").fill("a url");
+        await page.getByRole("button", { name: "create" }).click();
+      });
+
+      test("a user can like a blog", async ({ page }) => {
+        await page.getByRole("button", { name: "view" }).click();
+        await page.getByRole("button", { name: "like" }).click();
+        await expect(page.getByText("likes 1")).toBeVisible();
+      });
+
+      test("the same user can delete the blog", async ({ page }) => {
+        await page.getByRole("button", { name: "view" }).click();
+        page.on("dialog", (dialog) => dialog.accept());
+        await page.getByRole("button", { name: "remove" }).click();
+        await expect(
+          page.getByText("Blog was removed successfully")
+        ).toBeVisible();
+        await expect(page.getByText("a title fakename").isHidden()).toBeTruthy();
+      });
+    });
   });
 });
